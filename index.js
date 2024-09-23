@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
@@ -39,10 +39,46 @@ async function run() {
           res.send(result)
       })
       // Read Method
-      app.get('/tours', async (req, res) => {
+      app.get('/tour', async (req, res) => {
           const coursor = await tourCollection.find().toArray()
           res.send(coursor)
       })
+    // DElETE METHOD
+    app.delete('/tour/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await tourCollection.deleteOne(query)
+      res.send(result)
+    })
+    // UPDATE
+
+    app.get('/tour/:id', async (req, res) => {
+      const id = req.params.id;
+      // console.log(id);
+      const query = { _id: new ObjectId(id) }
+      // console.log(query);
+      const result = await tourCollection.findOne(query)
+      res.send(result)
+    })
+    app.put('/tour/:id', async (req, res) => {
+      const id = req.params.id
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updateTourist = req.body;
+      const  Tourist = {
+        $set: {
+          name: updateTourist.name,
+          photo: updateTourist.photo,
+          username: updateTourist.username,
+          Cost: updateTourist.Cost,
+          email: updateTourist.email,
+          location: updateTourist.location,
+          description: updateTourist.description
+        }
+      }
+      const result = await tourCollection.updateOne(filter, Tourist, options)
+      res.send(result)
+    })
       
       
 
