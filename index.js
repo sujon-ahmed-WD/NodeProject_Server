@@ -82,14 +82,38 @@ async function run() {
     })
     
     // USER related apis
+    // CREATE OPERATION >>>>
     app.post('/user', async (req, res) => {
       const user = req.body;
       console.log(user);
       const result = await userCollection.insertOne(user)
       res.send(result);
     })
+    // READ OPERATION
+    app.get('/user', async (req, res) => {
+      const coursor = await userCollection.find().toArray()
+      res.send(coursor)
+    })
+    // DELETE
+    app.delete('/user/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await userCollection.deleteOne(query)
+      res.send(result)
+    })
+    // Patch
 
-      
+    app.patch('/user', async (req, res) => {
+      const user = req.body;
+      const filter = { email: user.email }
+      const updateDoc = {
+        $set: {
+          email:user.email
+        }
+      }
+      const result = await userCollection.updateOne(filter, updateDoc)
+      res.send(result)
+    })
 
     await client.db("admin").command({ ping: 1 });
     console.log(
